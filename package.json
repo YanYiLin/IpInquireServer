@@ -1,0 +1,37 @@
+{
+  "name": "IpInquire Server",
+  "version": "1.0.0",
+  "description": "IP Inquire Application on OpenShift",
+  "keywords": [
+  	"IP",
+  	"Inquire",
+    "Node.js",
+    "application",
+    "OpenShift",
+    "openshift"
+  ],
+  "author": {
+    "name": "Elen",
+    "email": "elen_rl@163.com",
+    "url": "http://www.zskit.com/"
+  },
+  "homepage": "http://ip.zskit.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/"
+  },
+
+  "engines": {
+    "node": ">= 0.6.0",
+    "npm": ">= 1.0.0"
+  },
+
+  "dependencies": {
+    "express": "~3.4.4"
+  },
+  "devDependencies": {},
+  "bundleDependencies": [],
+
+  "private": true,
+  "main": "server.js"
+}
