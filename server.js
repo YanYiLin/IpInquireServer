@@ -17,8 +17,8 @@
 
 var HTTP = require("http");
 var URL = require("url");
+var QS = require("querystring");
 var FS = require('fs');
-
 
 var CONFIG = {
 	"host": process.env.OPENSHIFT_NODEJS_IP,
@@ -108,6 +108,7 @@ function queryDetail( id ) {
 function requestFovicon( res ) {
 	res.writeHead( 200, {
 		"Content-Length": FAVICON.length,
+		"Access-Control-Allow-Origin": "*",
 		"Content-Type": "image/x-icon"
 	} );
 	res.write( FAVICON );
@@ -117,25 +118,18 @@ function requestFovicon( res ) {
 function requestInvalid( res ) {
 	res.writeHead( 403, {
 		"Content-Length": INVALID.length,
+		"Access-Control-Allow-Origin": "*",
 		"Content-Type": CTTEXT
 	} );
 	res.write( INVALID );
 	res.end();
 }
 
+
 /**
- * Create HTTP Server
+ * Response http request
  */
-HTTP.createServer( function( req, res ) {
-	var path=null,args=null;
-	if ( req.method === "GET" ) {
-		var url = URL.parse( req.url, true );
-		path = url.pathname;
-		args = url.query;
-	} else {
-		
-	}
-	
+function responseHttp( req, res, path, args ) {
 	// Path
 	switch ( path ) {
 		case "/favicon.ico":
@@ -176,9 +170,33 @@ HTTP.createServer( function( req, res ) {
 	// Set response data
 	res.writeHead( 200, {
 		"Content-Length": ret.length,
+		"Access-Control-Allow-Origin": "*",
 		"Content-Type": CTTEXT
 	} );
 	res.write( ret );
 	res.end();
-	
+}
+
+/**
+ * Create HTTP Server
+ */
+HTTP.createServer( function( req, res ) {
+	var path=null,args=null;
+	if ( req.method === "GET" ) {
+		var url = URL.parse( req.url, true );
+		path = url.pathname;
+		args = url.query;
+	} else {
+		var post = "";
+		req.setEncoding( "utf8" );
+		req.addListener( "data", function(d) {
+			post += d;
+		} );
+		req.addListener("end",function(){
+			args = QS.parse( post );
+			responseHttp( req, res, URL.parse(req.url).pathname, QS.parse(post) );
+		} );
+		return;
+	}
+	responseHttp( req, res, path, args );
 } ).listen( CONFIG.port, CONFIG.host );
